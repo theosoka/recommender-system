@@ -1,28 +1,18 @@
-from dataclasses import dataclass
-
-from sklearn.model_selection import train_test_split
-
 import pandas as pd
+from model_mixin import ModelMixin
 
 
-@dataclass
-class BaseModel:
-    dataset: pd.DataFrame
-    X: pd.DataFrame
-    y: pd.DataFrame
-    X_test: pd.DataFrame
-    X_train: pd.DataFrame
-    y_test: pd.DataFrame
-    y_train: pd.DataFrame
+def train_basic_models(dataset: pd.DataFrame, models_aliases: list):
+    for model in models_aliases:
+        model = ModelMixin(model_name=model, dataset=dataset)
+        model.run()
 
-    def __init__(self):
-        self.split_into_features_and_outcome()
-        self.split_train_test()
 
-    def split_into_features_and_outcome(self) -> None:
-        self.X, self.y = self.dataset[:, :-1], self.dataset[:, -1]
+def main():
+    models = []
+    dataset = pd.read_csv("/data/processed/lastfm_2k/user_artists.csv")
+    train_basic_models(dataset, models)
 
-    def split_train_test(self):
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
-            self.X, self.y, test_size=0.2, random_state=12
-        )
+
+if __name__ == "__main__":
+    main()
