@@ -2,15 +2,6 @@ from enum import Enum
 from surprise import KNNBasic, SVD, SVDpp, NMF, SlopeOne, BaselineOnly
 
 
-class ModelTypes(Enum):
-    KNN = "KNN"
-    SVD = "SVD"
-    SVDpp = "svdpp"
-    NMF = "nmf"
-    SLOPE_ONE = "slope"
-    BASELINE_ONLY = "baseline"
-
-
 class SurpriseModelsRepository(Enum):
     KNN = (
         KNNBasic,

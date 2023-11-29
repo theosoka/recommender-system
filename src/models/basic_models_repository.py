@@ -8,17 +8,6 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 
 
-class ModelNames(Enum):
-    PERCEPTRON = "pn"
-    GAUSSIAN_NAIVE_BAYES = "gnb"
-    MULTINOMIAL_NB = "mnb"
-    SVC = "svc"
-    SGD_CLASSIFIER = "sgd_c"
-    DECISION_TREE_CLASSIFIER = "dtc"
-    RANDOM_FOREST_CLASSIFIER = "rfc"
-    GRADIENT_BOOSTING_CLASSIFIER = "gbc"
-
-
 class BasicModelsRepository(Enum):
     PERCEPTRON = (
         (
