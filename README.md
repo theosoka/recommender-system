@@ -1,7 +1,7 @@
 recommendation-system
 ==============================
 
-practical part for my bachelor thesis at PJATK, using data from spotify
+practical part for my bachelor thesis at PJATK, using data from lastfm&spotify
 
 Project Organization
 ------------
