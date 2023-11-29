@@ -85,10 +85,7 @@ class ModelMixin:
         logger.info(f"Fitting {self.model_name}")
         self.split_into_features_and_target()
         self.split_train_test()
-        model, param_grid = (
-            BasicModelsRepository.MODELS[self.model_name]["model"],
-            BasicModelsRepository.MODELS[self.model_name]["param_grid"],
-        )
+        model, param_grid = getattr(BasicModelsRepository[self.model_name], "value")
         estimator = self._tune_and_fit_model(model, param_grid)
         self.predict_and_estimate(estimator)
         self.dump_model_into_file(estimator, self.model_name)
