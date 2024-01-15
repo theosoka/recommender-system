@@ -5,11 +5,9 @@ import click
 import logging
 from pathlib import Path
 import pandas as pd
-from sklearn.preprocessing import QuantileTransformer
-import numpy as np
 from enum import Enum
 
-from utils import make_data_binary, min_max_scaler
+from utils import make_data_binary
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -30,7 +28,7 @@ class Datasets(Enum):
 @click.argument("input_filepath", type=click.Path(exists=True))
 @click.argument("output_filepath", type=click.Path())
 @click.argument("dataset_name", type=click.STRING)
-def main(input_filepath, output_filepath, dataset_name):
+def main(dataset_name, input_filepath, output_filepath):
     """Runs data processing scripts to turn raw data from (../raw) into
     cleaned data ready to be analyzed (saved in ../processed).
     """
@@ -40,12 +38,6 @@ def main(input_filepath, output_filepath, dataset_name):
     match dataset_name:
         case Datasets.LASTFM_2K.value:
             processed_dataframes = make_lastfm_2k_dataset(input_filepath)
-        case Datasets.LASTFM_1K.value:
-            processed_dataframes = make_lastfm_1k_dataset(input_filepath)
-        case Datasets.SPOTIFY.value:
-            processed_dataframes = make_spotify_dataset(input_filepath)
-        case Datasets.SPOTIFY_JSONS.value:
-            processed_dataframes = make_spotify_jsons_dataset(input_filepath)
         case _:
             logger.info(f"{dataset_name} is not valid.")
 
@@ -59,18 +51,25 @@ def make_lastfm_2k_dataset(input_filepath: str) -> dict:
         Path(input_filepath) / "hetrec2011-lastfm-2k/user_artists.dat", sep="\t"
     )
     logger.info("Removing skewness in user_artists.weight")
-
-    user_artists.weight = min_max_scaler(user_artists, "weight")
+    user_artists = make_data_binary(user_artists, 20, "weight")
     user_friends = pd.read_csv(
         Path(input_filepath) / "hetrec2011-lastfm-2k/user_friends.dat", sep="\t"
     )
 
-    user_taggedartists = pd.read_csv(
+    user_tagged_artists = pd.read_csv(
         Path(input_filepath) / "hetrec2011-lastfm-2k/user_taggedartists-timestamps.dat",
         sep="\t",
     )
+    artist_most_popular_tag = (
+        user_tagged_artists.groupby("artistID")["tagID"].agg(pd.Series.mode).to_frame()
+    )
+    #  user_artists = user_artists.join(artist_most_popular_tag, on="artistID")
 
-    tags = pd.read_csv(Path(input_filepath) / "hetrec2011-lastfm-2k/tags.dat", sep="\t", encoding="latin-1")
+    tags = pd.read_csv(
+        Path(input_filepath) / "hetrec2011-lastfm-2k/tags.dat",
+        sep="\t",
+        encoding="latin-1",
+    )
 
     artists = pd.read_csv(
         Path(input_filepath) / "hetrec2011-lastfm-2k/artists.dat",
@@ -79,37 +78,17 @@ def make_lastfm_2k_dataset(input_filepath: str) -> dict:
     )
     logger.info("Dropping rows with null values.")
     artists = artists.dropna()
+    artists = artists.drop(columns=["url", "pictureURL"])
 
     processed_dataframes = {
         "user_artists": user_artists,
         "user_friends": user_friends,
-        "user_taggedartists": user_taggedartists,
+        "user_tagged_artists": artist_most_popular_tag,
         "tags": tags,
         "artists": artists,
     }
 
     return processed_dataframes
-
-
-def make_lastfm_1k_dataset(input_filepath: str) -> dict:
-    user_profiles = pd.read_csv(Path(input_filepath) / "lastfm_1k/userid-profile.tsv")
-    user_tracks = pd.read_csv(
-        Path(input_filepath)
-        / "lastfm_1k/userid-timestamp-artid-artname-traid-traname.tsv"
-    )
-
-    return {}
-
-
-def make_spotify_dataset(input_filepath: str) -> dict:
-    track_features = pd.read_csv(Path(input_filepath) / "track_features/tf_mini.csv")
-    training_set = pd.read_csv(Path(input_filepath) / "training_set/log_mini.csv")
-
-    return {}
-
-
-def make_spotify_jsons_dataset(input_filepath: str) -> dict:
-    return {}
 
 
 if __name__ == "__main__":

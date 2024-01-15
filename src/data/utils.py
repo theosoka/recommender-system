@@ -3,8 +3,8 @@ from sklearn.preprocessing import MinMaxScaler
 
 
 def make_data_binary(df: pd.DataFrame, threshold: int, column: str) -> pd.DataFrame:
-    df.loc[df[column] >= threshold, column] = 1
     df.loc[df[column] < threshold, column] = 0
+    df.loc[df[column] >= threshold, column] = 1
     return df
 
 
