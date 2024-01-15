@@ -11,7 +11,7 @@ from sklearn.metrics import accuracy_score, f1_score
 
 import pandas as pd
 
-from basic_models_repository import BasicModelsRepository
+from src.models.basic.basic_models_repository import BasicModelsRepository
 
 logger = logging.getLogger("model_mixin")
 logger.setLevel(logging.INFO)

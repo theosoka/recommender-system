@@ -7,10 +7,10 @@ import pandas as pd
 from surprise import Reader, Dataset
 from surprise.model_selection import train_test_split
 from surprise import accuracy
-from surprise_models_repository import SurpriseModelsRepository
+from src.models.basic.surprise_models_repository import SurpriseModelsRepository
 from surprise.model_selection import GridSearchCV
 
-from model_mixin import ModelMixin
+from ..model_mixin import ModelMixin
 
 logger = logging.getLogger("cf_surprise")
 logger.setLevel(logging.INFO)
@@ -58,9 +58,7 @@ class CollaborativeFiltering(ModelMixin):
         return accuracy.rmse(predictions)
 
 
-dataset = pd.read_csv(
-    "/Users/polina/study/THESIS/recommender-system/data/processed/lastfm_2k/user_artists.csv"
-)
+dataset = pd.read_csv("/data/processed/lastfm_2k/user_artists.csv")
 models = [
     "SLOPE",
     "BASELINE",
