@@ -1,61 +1,98 @@
 # -*- coding: utf-8 -*-
+import sys
+
 import click
 import logging
 from pathlib import Path
-from dotenv import find_dotenv, load_dotenv
 import pandas as pd
-from sklearn.preprocessing import QuantileTransformer
-import numpy as np
+from enum import Enum
+
+from utils import make_data_binary
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+stdout_handler = logging.StreamHandler(stream=sys.stdout)
+stdout_handler.addFilter(lambda rec: rec.levelno <= logging.INFO)
+logger.addHandler(stdout_handler)
+
+
+class Datasets(Enum):
+    LASTFM_2K = "lastfm_2k"
+    LASTFM_1K = "lastfm_1k"
+    SPOTIFY = "spotify"
+    SPOTIFY_JSONS = "spotify_jsons"
 
 
 @click.command()
-@click.argument('input_filepath', type=click.Path(exists=True))
-@click.argument('output_filepath', type=click.Path())
-def main(input_filepath, output_filepath):
-    """ Runs data processing scripts to turn raw data from (../raw) into
-        cleaned data ready to be analyzed (saved in ../processed).
+@click.argument("input_filepath", type=click.Path(exists=True))
+@click.argument("output_filepath", type=click.Path())
+@click.argument("dataset_name", type=click.STRING)
+def main(dataset_name, input_filepath, output_filepath):
+    """Runs data processing scripts to turn raw data from (../raw) into
+    cleaned data ready to be analyzed (saved in ../processed).
     """
-    logger = logging.getLogger(__name__)
-    logger.info('making final data set from raw data')
-    logger.info('reading raw datasets')
+    processed_dataframes = {}
 
-    user_artists = pd.read_csv(Path(input_filepath) / "user_artists.dat", sep="\t")
-    logger.info('removing skewness in user_artists.weight')
-    qt = QuantileTransformer(n_quantiles=500, output_distribution='normal')
-    user_artists.weight = pd.Series((qt.fit_transform(np.array(user_artists.weight).reshape(-1, 1))).flatten())
+    logger.info(f"Chosen dataset to process: {dataset_name}")
+    match dataset_name:
+        case Datasets.LASTFM_2K.value:
+            processed_dataframes = make_lastfm_2k_dataset(input_filepath)
+        case _:
+            logger.info(f"{dataset_name} is not valid.")
 
-    user_friends = pd.read_csv(Path(input_filepath) / "user_friends.dat", sep="\t")
+    for name, df in processed_dataframes.items():
+        filename = f"{name}.csv"
+        df.to_csv(Path(output_filepath) / f"{dataset_name}/{filename}", index=False)
 
-    user_taggedartists = pd.read_csv(Path(input_filepath) / "user_taggedartists-timestamps.dat", sep="\t")
 
-    tags = pd.read_csv(Path(input_filepath) / "tags.dat", sep="\t", encoding='latin-1')
+def make_lastfm_2k_dataset(input_filepath: str) -> dict:
+    user_artists = pd.read_csv(
+        Path(input_filepath) / "hetrec2011-lastfm-2k/user_artists.dat", sep="\t"
+    )
+    logger.info("Removing skewness in user_artists.weight")
+    user_artists = make_data_binary(user_artists, 20, "weight")
+    user_friends = pd.read_csv(
+        Path(input_filepath) / "hetrec2011-lastfm-2k/user_friends.dat", sep="\t"
+    )
 
-    artists = pd.read_csv(Path(input_filepath) / "artists.dat", sep="\t", encoding='latin-1')
-    logger.info('dropping rows with null values')
+    user_tagged_artists = pd.read_csv(
+        Path(input_filepath) / "hetrec2011-lastfm-2k/user_taggedartists-timestamps.dat",
+        sep="\t",
+    )
+    artist_most_popular_tag = (
+        user_tagged_artists.groupby("artistID")["tagID"].agg(pd.Series.mode).to_frame()
+    )
+    #  user_artists = user_artists.join(artist_most_popular_tag, on="artistID")
+
+    tags = pd.read_csv(
+        Path(input_filepath) / "hetrec2011-lastfm-2k/tags.dat",
+        sep="\t",
+        encoding="latin-1",
+    )
+
+    artists = pd.read_csv(
+        Path(input_filepath) / "hetrec2011-lastfm-2k/artists.dat",
+        sep="\t",
+        encoding="latin-1",
+    )
+    logger.info("Dropping rows with null values.")
     artists = artists.dropna()
+    artists = artists.drop(columns=["url", "pictureURL"])
 
     processed_dataframes = {
         "user_artists": user_artists,
         "user_friends": user_friends,
-        "user_taggedartists": user_taggedartists,
+        "user_tagged_artists": artist_most_popular_tag,
         "tags": tags,
         "artists": artists,
     }
 
-    for name, df in processed_dataframes.items():
-        filename = f"{name}.csv"
-        df.to_csv(Path(output_filepath) / filename, index=False)
+    return processed_dataframes
 
 
-if __name__ == '__main__':
-    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+if __name__ == "__main__":
+    log_fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     logging.basicConfig(level=logging.INFO, format=log_fmt)
-
-    # not used in this stub but often useful for finding various files
-    project_dir = Path(__file__).resolve().parents[2]
-
-    # find .env automagically by walking up directories until it's found, then
-    # load up the .env entries as environment variables
-    load_dotenv(find_dotenv())
 
     main()
