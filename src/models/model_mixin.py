@@ -56,7 +56,8 @@ class ModelMixin:
             classifier = GridSearchCV(
                 model,
                 param_grid,
-                n_jobs=1,
+                n_jobs=-1,
+                verbose=1,
             )
             logger.info("Fitting the best estimator.")
             classifier.fit(self.X, self.y)
@@ -66,7 +67,7 @@ class ModelMixin:
             return model
 
     def dump_model_into_file(self, model, name) -> None:
-        file_path = self.models_dump_path / f"{name}.pkl"
+        file_path = self.models_dump_path / f"{name.lower()}.pkl"
         logger.info(f"Dumping model into {file_path}")
         pickle.dump(model, open(file_path, "wb"))
 
@@ -85,7 +86,8 @@ class ModelMixin:
         logger.info(f"Fitting {self.model_name}")
         self.split_into_features_and_target()
         self.split_train_test()
-        model, param_grid = getattr(BasicModelsRepository[self.model_name], "value")
+        model_info = getattr(BasicModelsRepository[self.model_name], "value")
+        model, param_grid = model_info[0], model_info[1]
         estimator = self._tune_and_fit_model(model, param_grid)
         self.predict_and_estimate(estimator)
         self.dump_model_into_file(estimator, self.model_name)

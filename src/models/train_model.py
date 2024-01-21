@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 from .model_mixin import ModelMixin
 
@@ -10,7 +12,7 @@ def train_basic_models(dataset: pd.DataFrame, models_aliases: list):
 
 def main():
     models = []
-    dataset = pd.read_csv("/data/processed/lastfm_2k/user_artists.csv")
+    dataset = pd.read_csv(Path() / "../../data/processed/lastfm_2k/user_artists.csv")
     train_basic_models(dataset, models)
 
 
