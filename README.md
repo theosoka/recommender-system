@@ -1,10 +1,15 @@
-recommendation-system
+Evaluating and Comparing Models for Music Recommender Systems
 ==============================
 
-practical part for my bachelor thesis at PJATK, using data from lastfm&spotify
+<sup> Faculty of Computer Science | Intelligent Data Processing Systems
 
-Project Organization
-------------
+Author: Polina Lysenko, Supervisor
+Wojciech Oronowicz – Jaśkowiak, PhD</sup> 
+
+
+## USED TOOLS
+
+### Project Organization - Cookiecutter Data Science
 
     ├── LICENSE
     ├── Makefile           <- Makefile with commands like `make data` or `make train`

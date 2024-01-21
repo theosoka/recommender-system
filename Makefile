@@ -5,7 +5,7 @@
 #################################################################################
 
 PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-BUCKET = [OPTIONAL] your-bucket-for-syncing-data (do not include 's3://')
+BUCKET = plysenko-thesis-datasets
 PROFILE = default
 PROJECT_NAME = recommendation-system
 PYTHON_INTERPRETER = python3
