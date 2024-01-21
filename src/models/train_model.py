@@ -1,5 +1,5 @@
 import pandas as pd
-from model_mixin import ModelMixin
+from .model_mixin import ModelMixin
 
 
 def train_basic_models(dataset: pd.DataFrame, models_aliases: list):

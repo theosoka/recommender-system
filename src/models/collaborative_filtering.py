@@ -1,8 +1,5 @@
-import logging
-import pickle
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Optional, Any
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -86,38 +83,3 @@ class CollaborativeFiltering(ModelMixin):
                 recommendations.iloc[:, i]
             )
         return recommendations
-
-
-# dataset = pd.read_csv(Path() / "../../data/processed/lastfm_2k/user_artists.csv")
-#
-# artists = [
-#     "Moonspell",
-#     "Marilyn Manson",
-#     "MALICE MIZER",
-#     "Diary of Dreams",
-#     "Tamtrum",
-#     "Amduscia",
-#     "Covenant",
-#     "KMFDM",
-#     "Emperor",
-#     "Morcheeba",
-# ]
-# artists_df = pd.read_csv(Path() / "../../data/processed/lastfm_2k/artists.csv")
-#
-# ids = artists_df[artists_df.name.isin(artists)].id
-# print(dataset.shape)
-# new_data = pd.DataFrame({"userID": [1] * 10, "artistID": list(ids), "weight": [1] * 10})
-# dataset = pd.concat([dataset, new_data], ignore_index=True)
-# print(list(ids))
-#
-#
-# model = CollaborativeFiltering(model_name="Collaborative Filtering", dataset=dataset)
-#
-# # Get recommendations for the new user
-# # new_user_recommendations = model.get_recommendations(dataset)
-# #
-# # print("Recommendations for the new user:")
-# # new_recs = new_user_recommendations.iloc[0]
-# # print(list(new_recs))
-#
-# pickle.dump(model, open(Path() / "../../models/cf.pkl", "wb"))
