@@ -10,6 +10,7 @@ Wojciech Oronowicz – Jaśkowiak, PhD</sup>
 ## USED TOOLS
 
 ### Project Organization - Cookiecutter Data Science
+The structure was changed according to my needs and is not the same as the initial template.
 
     ├── LICENSE
     ├── Makefile           <- Makefile with commands like `make data` or `make train`
@@ -37,24 +38,18 @@ Wojciech Oronowicz – Jaśkowiak, PhD</sup>
     │                         generated with `pip freeze > requirements.txt`
     │
     ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
-    ├── src                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
-    │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   └── make_dataset.py
-    │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
-    │   │
-    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
-    │
-    └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
+    └── src                <- Source code for use in this project.
+        ├── __init__.py    <- Makes src a Python module
+        │
+        ├── data           <- Scripts to download or generate data
+        │   └── make_dataset.py
+        │
+        └── models         <- Scripts to train models and then use trained models to make
+            │                 predictions
+            ├── predict_model.py
+            └── train_model.py
+
+
 
 
 --------

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+from copy import deepcopy
 
 import click
 import logging
@@ -7,7 +8,7 @@ from pathlib import Path
 import pandas as pd
 from enum import Enum
 
-from utils import make_data_binary
+from utils import make_data_binary, min_max_scaler, drop_outliners
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -50,12 +51,11 @@ def make_lastfm_2k_dataset(input_filepath: str) -> dict:
     user_artists = pd.read_csv(
         Path(input_filepath) / "hetrec2011-lastfm-2k/user_artists.dat", sep="\t"
     )
-    logger.info("Removing skewness in user_artists.weight")
-    user_artists = make_data_binary(user_artists, 20, "weight")
+    user_artists_prepared, user_artists_binary = make_user_artist(user_artists)
+
     user_friends = pd.read_csv(
         Path(input_filepath) / "hetrec2011-lastfm-2k/user_friends.dat", sep="\t"
     )
-
     user_tagged_artists = pd.read_csv(
         Path(input_filepath) / "hetrec2011-lastfm-2k/user_taggedartists-timestamps.dat",
         sep="\t",
@@ -63,7 +63,6 @@ def make_lastfm_2k_dataset(input_filepath: str) -> dict:
     artist_most_popular_tag = (
         user_tagged_artists.groupby("artistID")["tagID"].agg(pd.Series.mode).to_frame()
     )
-    #  user_artists = user_artists.join(artist_most_popular_tag, on="artistID")
 
     tags = pd.read_csv(
         Path(input_filepath) / "hetrec2011-lastfm-2k/tags.dat",
@@ -76,19 +75,41 @@ def make_lastfm_2k_dataset(input_filepath: str) -> dict:
         sep="\t",
         encoding="latin-1",
     )
-    logger.info("Dropping rows with null values.")
-    artists = artists.dropna()
-    artists = artists.drop(columns=["url", "pictureURL"])
+    artists_prepared = make_artists(artists)
 
     processed_dataframes = {
-        "user_artists": user_artists,
+        "user_artists_prepared": user_artists_prepared,
+        "user_artists_binary": user_artists_binary,
         "user_friends": user_friends,
         "user_tagged_artists": artist_most_popular_tag,
         "tags": tags,
-        "artists": artists,
+        "artists": artists_prepared,
     }
 
     return processed_dataframes
+
+
+def make_user_artist(user_artists: pd.DataFrame):
+    logger.info("Dropping outliners from user_artists")
+    user_artists_no_outliners = drop_outliners(df=user_artists, column="weight")
+    logger.info("Normalising user_artists.weight")
+    user_artists_binary = make_data_binary(
+        df=user_artists_no_outliners, threshold=20, column="weight"
+    )
+    user_artists_no_outliners.weight = min_max_scaler(
+        user_artists_no_outliners, "weight"
+    )
+    return user_artists_no_outliners, user_artists_binary
+
+
+def make_artists(artists: pd.DataFrame):
+    logger.info("Dropping unnecessary columns from artists df.")
+    artists_only_features = artists.drop(columns=["url", "pictureURL"])
+    logger.info("Removing feats from artists df.")
+    artists_no_feats = artists_only_features[
+        artists_only_features["name"].str.contains(" ft. ") == False
+    ]
+    return artists_no_feats
 
 
 if __name__ == "__main__":

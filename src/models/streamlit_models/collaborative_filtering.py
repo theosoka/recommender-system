@@ -8,7 +8,7 @@ from scipy.sparse import csr_matrix
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import LabelEncoder
 
-from .train_model import ModelMixin
+from src.models.basic_models_exploration.model_mixin import ModelMixin
 
 
 @dataclass
@@ -25,7 +25,7 @@ class CollaborativeFiltering(ModelMixin):
 
     @property
     def artists_ids(self):
-        pass
+        return set(self.dataset.artistID)
 
     @property
     def group_by_user(self) -> pd.DataFrame:
@@ -63,7 +63,7 @@ class CollaborativeFiltering(ModelMixin):
 
         return pd.concat(rec_for_crust)
 
-    def get_recommendations(self, data):
+    def get_recommendations(self, data, top_n=10):
         user_label_encoder = LabelEncoder()
 
         user_ids = user_label_encoder.fit_transform(data.userID)
@@ -73,7 +73,7 @@ class CollaborativeFiltering(ModelMixin):
             user_ids, product_ids
         )
         recommendations = self.get_recommendations_from_similarity(
-            similarity_matrix, artist_user_sim_matrix
+            similarity_matrix, artist_user_sim_matrix, top_n
         )
         recommendations.index = user_label_encoder.inverse_transform(
             recommendations.index
