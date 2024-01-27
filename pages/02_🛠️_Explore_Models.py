@@ -3,7 +3,7 @@ import streamlit as st
 st.set_page_config(page_title="Explore Models", page_icon="📊")
 
 model_names = [
-    "Perceptron",
+    "Collaborative Filtering",
     "KNN",
 ]
 

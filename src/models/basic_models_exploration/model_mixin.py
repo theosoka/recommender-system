@@ -11,7 +11,7 @@ from sklearn.metrics import accuracy_score, f1_score
 
 import pandas as pd
 
-from src.models.basic.basic_models_repository import BasicModelsRepository
+from .basic_models_repository import BasicModelsRepository
 
 logger = logging.getLogger("model_mixin")
 logger.setLevel(logging.INFO)
@@ -36,7 +36,6 @@ class ModelMixin:
     def __post_init__(self):
         self.split_into_features_and_target()
         self.split_train_test()
-        #  todo: pass with init statements
 
     def split_into_features_and_target(self) -> None:
         logger.info(
