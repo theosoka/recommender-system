@@ -54,7 +54,7 @@ def display_recommendations(selected_items: list[str], top_n_rec: int):
     model = CollaborativeFiltering(
         model_name="Collaborative Filtering", dataset=updated_dataset
     )
-    new_user_recommendations = model.get_recommendations(
+    new_user_recommendations = model.generate_recommendations(
         updated_dataset, top_n_rec
     ).iloc[0]
     artist_names = artists_df[artists_df.id.isin(list(new_user_recommendations))].name
