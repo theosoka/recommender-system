@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Set
 
 import numpy as np
 import pandas as pd
@@ -16,32 +16,34 @@ class CollaborativeFiltering(ModelMixin):
     user_artist_matrix: Optional[csr_matrix] = None
     artist_user_matrix: Optional[csr_matrix] = None
     artist_similarity: Optional[cosine_similarity] = None
-    user_label_encoder: Optional = None
-    artist_label_encoder: Optional = None
+    user_label_encoder: Optional[LabelEncoder] = None
+    artist_label_encoder: Optional[LabelEncoder] = None
 
     @property
-    def user_ids(self):
+    def user_ids(self) -> Set:
         return set(self.dataset.userID)
 
     @property
-    def artists_ids(self):
+    def artists_ids(self) -> Set:
         return set(self.dataset.artistID)
 
     @property
     def group_by_user(self) -> pd.DataFrame:
         return self.dataset.groupby(["userID", "artistID"]).sum().reset_index()
 
-    def get_item_item_similarity(self, user_ids, artist_ids):
-        artist_user_matrix = csr_matrix(([1] * len(user_ids), (artist_ids, user_ids)))
-        self.artist_user_matrix = artist_user_matrix
-
-        similarity = cosine_similarity(artist_user_matrix)
-        return similarity, artist_user_matrix
+    def get_item_item_similarity(
+        self, user_ids: np.ndarray, artist_ids: np.ndarray
+    ) -> tuple[cosine_similarity, csr_matrix]:
+        self.artist_user_matrix = csr_matrix(
+            ([1] * len(user_ids), (artist_ids, user_ids))
+        )
+        similarity = cosine_similarity(self.artist_user_matrix)
+        return similarity, self.artist_user_matrix
 
     def get_recommendations_from_similarity(
-        self, similarity_matrix, artist_user_matrix, top_n=10
-    ):
-        user_artist_matrix = csr_matrix(artist_user_matrix.T)
+        self, similarity_matrix: cosine_similarity, top_n: int = 10
+    ) -> pd.DataFrame:
+        user_artist_matrix = csr_matrix(self.artist_user_matrix.T)
         user_artist_scores = user_artist_matrix.dot(similarity_matrix)
 
         rec_for_crust = []
@@ -57,29 +59,34 @@ class CollaborativeFiltering(ModelMixin):
             recommendations = pd.DataFrame(
                 top_products_ids.reshape(1, -1),
                 index=[user_id],
-                columns=["Top%s" % (i + 1) for i in range(top_n)],
+                columns=[f"Top{i + 1}" for i in range(top_n)],
             )
             rec_for_crust.append(recommendations)
 
         return pd.concat(rec_for_crust)
 
-    def get_recommendations(self, data, top_n=10):
-        user_label_encoder = LabelEncoder()
+    def get_recommendations(self, data: pd.DataFrame, top_n: int = 10) -> pd.DataFrame:
+        self.user_label_encoder = LabelEncoder()
+        user_ids = self.user_label_encoder.fit_transform(data.userID)
 
-        user_ids = user_label_encoder.fit_transform(data.userID)
         product_label_encoder = LabelEncoder()
         product_ids = product_label_encoder.fit_transform(data.artistID)
+
         similarity_matrix, artist_user_sim_matrix = self.get_item_item_similarity(
             user_ids, product_ids
         )
+
         recommendations = self.get_recommendations_from_similarity(
-            similarity_matrix, artist_user_sim_matrix, top_n
+            similarity_matrix, top_n
         )
-        recommendations.index = user_label_encoder.inverse_transform(
+
+        recommendations.index = self.user_label_encoder.inverse_transform(
             recommendations.index
         )
-        for i in range(recommendations.shape[1]):
-            recommendations.iloc[:, i] = product_label_encoder.inverse_transform(
-                recommendations.iloc[:, i]
+
+        for col in recommendations.columns:
+            recommendations[col] = product_label_encoder.inverse_transform(
+                recommendations[col]
             )
+
         return recommendations

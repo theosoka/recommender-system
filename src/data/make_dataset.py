@@ -60,6 +60,7 @@ def make_lastfm_2k_dataset(input_filepath: str) -> dict:
         Path(input_filepath) / "hetrec2011-lastfm-2k/user_taggedartists-timestamps.dat",
         sep="\t",
     )
+    user_tagged_artists.drop_duplicates()
     artist_most_popular_tag = (
         user_tagged_artists.groupby("artistID")["tagID"].agg(pd.Series.mode).to_frame()
     )
@@ -104,7 +105,7 @@ def make_user_artist(user_artists: pd.DataFrame):
 
 def make_artists(artists: pd.DataFrame):
     logger.info("Dropping unnecessary columns from artists df.")
-    artists_only_features = artists.drop(columns=["url", "pictureURL"])
+    artists_only_features = artists.drop(columns=["pictureURL"])
     logger.info("Removing feats from artists df.")
     artists_no_feats = artists_only_features[
         artists_only_features["name"].str.contains(" ft. ") == False

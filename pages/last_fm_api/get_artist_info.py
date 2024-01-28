@@ -2,16 +2,22 @@ import requests
 from env.constants import API_KEY
 
 
-def lastfm_get_artists_urls(artists_names: list[str]) -> dict[str, str]:
-    artists_urls = dict()
-    for artist_name in artists_names:
+def get_top_tracks_for_artists(artist_names: list[str]) -> dict[str, list[str]]:
+    top_tracks_dict = {}
+
+    for artist_name in artist_names:
         payload = {
             "api_key": API_KEY,
-            "method": "artist.getinfo",
+            "method": "artist.gettoptracks",
             "artist": artist_name,
             "format": "json",
+            "limit": 5,
         }
+
         r = requests.get("https://ws.audioscrobbler.com/2.0/", params=payload)
-        link = r.json()["artist"]["bio"]["links"]["link"]["href"]
-        artists_urls[artist_name] = link
-    return artists_urls
+        top_tracks_data = r.json().get("toptracks", {}).get("track", [])
+
+        top_tracks = [track["name"] for track in top_tracks_data]
+        top_tracks_dict[artist_name] = top_tracks
+
+    return top_tracks_dict
