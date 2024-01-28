@@ -11,10 +11,10 @@ datasets_names = [
     "tags",
     "user_artists",
     "user_friends",
-    "user_taggedartists",
+    "user_tagged_artists",
 ]
 
-artists, tags, user_artists, user_friends, user_taggedartists = st.tabs(datasets_names)
+artists, tags, user_artists, user_friends, user_tagged_artists = st.tabs(datasets_names)
 
 
 with artists:
@@ -33,7 +33,7 @@ with tags:
 
 with user_artists:
     user_artists_df = pd.read_csv(
-        "/Users/polina/study/THESIS/recommender-system/data/processed/lastfm_2k/user_artists.csv"
+        "/Users/polina/study/THESIS/recommender-system/data/processed/lastfm_2k/user_artists_prepared.csv"
     )
     pr_user_artists = user_artists_df.profile_report()
     st_profile_report(pr_user_artists)
@@ -45,9 +45,9 @@ with user_friends:
     pr_user_friends = user_friends_df.profile_report()
     st_profile_report(pr_user_friends)
 
-with user_taggedartists:
-    user_taggedartists_df = pd.read_csv(
-        "/Users/polina/study/THESIS/recommender-system/data/processed/lastfm_2k/user_taggedartists.csv"
+with user_tagged_artists:
+    user_tagged_artists_df = pd.read_csv(
+        "/Users/polina/study/THESIS/recommender-system/data/processed/lastfm_2k/user_tagged_artists.csv"
     )
-    pr_user_taggedartists = user_taggedartists_df.profile_report()
-    st_profile_report(pr_user_taggedartists)
+    pr_user_tagged_artists = user_tagged_artists_df.profile_report()
+    st_profile_report(pr_user_tagged_artists)

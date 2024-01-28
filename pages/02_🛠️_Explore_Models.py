@@ -3,16 +3,16 @@ import streamlit as st
 st.set_page_config(page_title="Explore Models", page_icon="📊")
 
 model_names = [
-    "Collaborative Filtering",
+    "Item-Item Collaborative Filtering",
     "KNN",
+    "Slope One",
+    "Gradient Boosting Classifier",
+    "SVD",
 ]
 
-(
-    perceptron,
-    knn,
-) = st.tabs(model_names)
+(cf, knn, slope, gbc, svd) = st.tabs(model_names)
 
-with perceptron:
+with cf:
     st.markdown(
         """In machine learning, the **perceptron** (or **McCulloch–Pitts neuron**) is an algorithm for supervised learning of 
         binary classifiers. A binary classifier is a function which can decide whether or not an input, represented 
@@ -25,4 +25,32 @@ with perceptron:
 
     st.latex(
         r"""{\displaystyle f(\mathbf {x} )=\theta (\mathbf {w} \cdot \mathbf {x} +b)}"""
+    )
+
+with knn:
+    st.markdown(
+        """
+    knn
+    """
+    )
+
+with slope:
+    st.markdown(
+        """
+    slope
+    """
+    )
+
+with gbc:
+    st.markdown(
+        """
+    gbc
+    """
+    )
+
+with svd:
+    st.markdown(
+        """
+    svd
+    """
     )
