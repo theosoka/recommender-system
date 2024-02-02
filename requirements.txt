@@ -1,5 +1,5 @@
 flake8>=3.8.0,<4.0.0
-jupyterlab==4.3.2
+jupyterlab==4.0.10
 matplotlib==3.8.2
 matplotlib-inline==0.1.6
 missingno==0.5.2
