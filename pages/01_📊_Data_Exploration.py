@@ -1,16 +1,9 @@
-import pandas as pd
-import ydata_profiling
 import streamlit as st
 from streamlit_pandas_profiling import st_profile_report
-from st_files_connection import FilesConnection
 from pages.last_fm_api.make_data_from_s3 import get_dataframes
 
 st.set_page_config(page_title="Data Exploration", page_icon="📊")
 st.title("Datasets Profiles")
-
-conn = st.connection("s3", type=FilesConnection)
-s3_folder_path = "plysenko-thesis-datasets/data/hetrec2011-lastfm-2k/"
-file_list = conn.list(s3_folder_path)
 
 datasets_names = [
     "artists",
