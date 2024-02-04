@@ -5,6 +5,7 @@ import pandas as pd
 import streamlit as st
 from src.models.streamlit_models.collaborative_filtering import CollaborativeFiltering
 from pages.streamlit_utils.make_data_from_s3 import get_dataframes
+from pages.streamlit_utils.get_artist_info import get_top_tracks_for_artists
 
 st.set_page_config(page_title="Get Recommendations", page_icon="📊")
 
@@ -57,7 +58,7 @@ def display_recommendations(selected_items: list[str], top_n_rec: int):
     ).iloc[0]
     artist_names = artists_df[artists_df.id.isin(list(new_user_recommendations))].name
     artist_urls = artists_df[artists_df.id.isin(list(new_user_recommendations))].url
-    top_tracks_dict = {}
+    top_tracks_dict = get_top_tracks_for_artists(artist_names)
     artist_dict = dict(
         zip(
             artist_names,
