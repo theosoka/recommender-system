@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-from copy import deepcopy
 
 import click
 import logging
@@ -8,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 from enum import Enum
 
-from utils import make_data_binary, min_max_scaler, drop_outliners
+from .utils import make_data_binary, min_max_scaler, drop_outliners
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -21,8 +20,6 @@ logger.addHandler(stdout_handler)
 class Datasets(Enum):
     LASTFM_2K = "lastfm_2k"
     LASTFM_1K = "lastfm_1k"
-    SPOTIFY = "spotify"
-    SPOTIFY_JSONS = "spotify_jsons"
 
 
 @click.command()
@@ -42,7 +39,13 @@ def main(dataset_name, input_filepath, output_filepath):
         case _:
             logger.info(f"{dataset_name} is not valid.")
 
-    for name, df in processed_dataframes.items():
+    save_data(processed_dataframes, output_filepath, dataset_name)
+
+
+def save_data(
+    dataframes_list: dict[str, pd.DataFrame], output_filepath: str, dataset_name: str
+) -> None:
+    for name, df in dataframes_list.items():
         filename = f"{name}.csv"
         df.to_csv(Path(output_filepath) / f"{dataset_name}/{filename}", index=False)
 
