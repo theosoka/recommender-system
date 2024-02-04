@@ -4,7 +4,8 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 from src.models.streamlit_models.collaborative_filtering import CollaborativeFiltering
-from pages.last_fm_api.get_artist_info import get_top_tracks_for_artists
+from pages.streamlit_utils.make_data_from_s3 import get_dataframes
+from pages.streamlit_utils.get_artist_info import get_top_tracks_for_artists
 
 st.set_page_config(page_title="Get Recommendations", page_icon="📊")
 
@@ -17,15 +18,13 @@ top_n = st.selectbox(
     placeholder="Select an amount..",
 )
 
-
-artists_df = pd.read_csv(Path() / "data/processed/lastfm_2k/artists.csv")
+artists_df, _, DATASET, _, _ = get_dataframes()
 artists = artists_df.name
 selected_artists = st.multiselect(
     "Choose min. 10 artists that you like",
     options=artists,
     placeholder="Choose artists...",
 )
-DATASET = pd.read_csv(Path() / "data/processed/lastfm_2k/user_artists_prepared.csv")
 
 
 def append_new_user_data(selected_items: list[str]):
