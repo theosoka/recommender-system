@@ -6,6 +6,10 @@ Unveiling Music Recommender Systems Approaches
 Author: Polina Lysenko, Supervisor
 Wojciech Oronowicz – Jaśkowiak, PhD</sup> 
 
+**LINK TO THE APP**: https://testing-deployment-s22821.streamlit.app/Get_Recommendations
+
+It's running right now from the streamlit-deployment branch.
+
 
 ## USED TOOLS
 
