@@ -1,5 +1,5 @@
 import requests
-from env.constants import API_KEY
+import streamlit as st
 
 
 def get_top_tracks_for_artists(artist_names: list[str]) -> dict[str, list[str]]:
@@ -7,7 +7,7 @@ def get_top_tracks_for_artists(artist_names: list[str]) -> dict[str, list[str]]:
 
     for artist_name in artist_names:
         payload = {
-            "api_key": API_KEY,
+            "api_key": st.secrets["LASTFM_API_KEY"],
             "method": "artist.gettoptracks",
             "artist": artist_name,
             "format": "json",
