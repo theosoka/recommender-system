@@ -21,7 +21,13 @@ datasets_names = [
 ]
 
 artists, tags, user_artists, user_friends, user_tagged_artists = st.tabs(datasets_names)
-artists_df, tags_df, user_artists_df, user_friends_df, user_tagged_artists_df = get_dataframes()
+(
+    artists_df,
+    tags_df,
+    user_artists_df,
+    user_friends_df,
+    user_tagged_artists_df,
+) = get_dataframes()
 
 with artists:
     pr = artists_df.profile_report()
