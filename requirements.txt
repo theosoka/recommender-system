@@ -12,3 +12,4 @@ streamlit_pandas_profiling==0.1.3
 surprise==0.1
 ydata_profiling==4.6.3
 s3fs==2023.12.2
+pandas-profiling
