@@ -13,6 +13,12 @@ from src.models.basic_models_exploration.model_mixin import ModelMixin
 
 @dataclass
 class CollaborativeFiltering(ModelMixin):
+    """
+    docs
+    https://medium.com/towards-data-science/recommend-using-scikit-learn-and-tensorflow-recommender-bc659d91301a
+    https://surprise.readthedocs.io/en/stable/FAQ.html
+    """
+
     user_artist_matrix: Optional[csr_matrix] = None
     artist_user_matrix: Optional[csr_matrix] = None
     artist_similarity: Optional[cosine_similarity] = None
